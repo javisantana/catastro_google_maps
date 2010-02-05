@@ -31,6 +31,8 @@ CatastroOverlay.prototype.update = function() {
   this.div_.style.left = Math.min(c2.x, c1.x) + "px";
   this.div_.style.top = Math.min(c2.y, c1.y)  + "px";
 
+  this.lastPixelPosition = c1;
+
 }
 
 CatastroOverlay.prototype.initialize = function(map) {
@@ -39,6 +41,7 @@ CatastroOverlay.prototype.initialize = function(map) {
   div.style.position = "absolute";
   this.map_ = map;
   this.div_ = div;
+  this.lastPixelPosition = this.map_.fromLatLngToDivPixel(this.map_.getBounds().getSouthWest());
   this.update();
   map.getPane(G_MAP_MAP_PANE).appendChild(div);
 
@@ -54,7 +57,13 @@ CatastroOverlay.prototype.copy = function() {
 }
 
 CatastroOverlay.prototype.redraw = function(force) {
-  if (!force) return;
-  this.update();
+  var s = this.map_.getSize()
+  var c1 = this.map_.fromLatLngToDivPixel(this.map_.getBounds().getSouthWest());
+  if (force ||
+      Math.abs(c1.x - this.lastPixelPosition.x) > s.width*0.25 ||
+      Math.abs(c1.y - this.lastPixelPosition.y) > s.height*0.25)
+  {
+    this.update();
+  }
 
 }
